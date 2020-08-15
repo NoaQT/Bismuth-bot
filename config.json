@@ -1,0 +1,10 @@
+{
+    "bot": {
+        "token": "",
+        "prefix": ";"
+    },
+    "server": {
+        "path_to_server_folder": "server",
+        "world_name": "world"
+    }
+}
