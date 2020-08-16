@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os, discord, json, utils
 from commands import scoreCommand, statsCommand, searchCommand, helpCommand
 from discord.ext import commands
