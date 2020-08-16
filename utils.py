@@ -1,5 +1,6 @@
 import json, requests, os, discord, math, io
-from PIL import ImageFont, ImageDraw, Image 
+from PIL import ImageFont, ImageDraw, Image
+from tqdm import tqdm
 
 def uuid_to_name(uuid):
     try:
@@ -16,7 +17,7 @@ def uuid_to_name(uuid):
 
 def get_player_cache(uuid_list):
     players = {}
-    for uuid in uuid_list:
+    for uuid in tqdm(uuid_list, desc="Loading player names"):
         player_name = uuid_to_name(uuid)
         players[uuid] = player_name if player_name != None else "Yeeted gamer"
     return players

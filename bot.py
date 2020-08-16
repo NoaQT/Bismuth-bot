@@ -44,7 +44,7 @@ commandsdict["help"].init(commandsdict)
 
 @Bot.event
 async def on_ready():
-    print("ready")
+    print("Bot ready")
     await Bot.change_presence(status=discord.Status.online, activity=discord.Game(name=PREFIX + "help"))
 
 @Bot.event
@@ -64,4 +64,5 @@ async def on_message(message):
         else:
             await message.channel.send("Command not found\nDo `" + PREFIX + "help` for a list of commands")
 
+print("Starting bot")
 Bot.run(TOKEN)
