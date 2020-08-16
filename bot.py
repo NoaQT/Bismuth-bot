@@ -61,6 +61,8 @@ async def on_message(message):
             args = args[1:] if len(args) > 1 else None
             await commandsdict[commandname].Command(message, args)
 
+            print("{} {} {}".format(message.created_at, message.author, message.content))
+
         else:
             await message.channel.send("Command not found\nDo `" + PREFIX + "help` for a list of commands")
 
