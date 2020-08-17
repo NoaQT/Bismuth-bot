@@ -1,7 +1,8 @@
 {
     "bot": {
         "token": "",
-        "prefix": ";"
+        "prefix": ";",
+        "member_role" : 635253207630872578
     },
     "server": {
         "path_to_server_folder": "server",

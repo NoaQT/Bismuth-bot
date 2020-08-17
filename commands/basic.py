@@ -4,16 +4,21 @@ from discord.ext import commands
 from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
 class basic(commands.Cog):
-    def __init__(self, world_folder, player_cache, player_list, stats_list):
+    def __init__(self, world_folder, player_cache, player_list, stats_list, member_role):
         self.world_folder = world_folder
         self.player_cache = player_cache
         self.stats_list = stats_list
+        self.member_role = member_role
         self.data_folder = os.path.join(world_folder, "data")
         self.stats_folder = os.path.join(world_folder, "stats")
         nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
         self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
         self.player_names = [player["name"] for player in player_list]
         self.storage_command = storageCommand.storageCommand(self.world_folder)
+
+    def is_member(ctx):
+        role = ctx.guild.get_role(ctx.cog.member_role)
+        return role in ctx.message.author.roles
         
     @commands.command(
     help="Shows all of the scores of the objective and the total"
@@ -51,14 +56,14 @@ class basic(commands.Cog):
     @storage.command(
         help="Adds a new storage location"
     )
-    @commands.has_role(628579235212165120)
+    @commands.check(is_member)
     async def add(self, ctx, dimension: str, name: str, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int):
         return await self.storage_command.add(ctx, name, dimension, x1, y1, z1, x2, y2, z2)
 
     @storage.command(
         help="Removes a storage location"
     )
-    @commands.has_role(628579235212165120)
+    @commands.check(is_member)
     async def remove(self, ctx, name):
         return await self.storage_command.remove(ctx, name)
 
