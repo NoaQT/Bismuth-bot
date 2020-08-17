@@ -50,15 +50,17 @@ class storageCommand(object):
             return
 
         del self.storage_dict[name]
-        del self.cache[name]
+        if name in self.cache:
+            del self.cache[name]
+
         self.save_config()
 
         await ctx.send(f"`Removed storage location {name}`")
 
     async def list_locations(self, ctx):
-        description = ""
+        description = "\n"
         for location in self.storage_dict:
-            description += f"{location}\n"
+            description += location + "\n"
         author = "Storage location list"
         footer_text = f"Total of {len(self.storage_dict)} storage locations"
 
@@ -80,19 +82,20 @@ class storageCommand(object):
 
     async def show(self, ctx, name, arg):
         if name not in self.storage_dict:
-            await ctx.send(f"`Storage location {name} doesn't exist`")
-            return
+            return await ctx.send(f"`Storage location {name} doesn't exist`")
 
         items = self.get_items(name)
 
         embed = discord.Embed(colour=0x9e42f5)
         if not arg or arg.isdigit():
             page = int(arg) if arg else 1
-            page_count = len(items)//20
+            page_count = len(items)//20 + 1
 
             if page > page_count:
-                ctx.send(f"`Page {page} doesn't exist`")
-                return
+                return await ctx.send(f"`Page {page} doesn't exist`")
+
+            if not items:
+                return await ctx.send("`None`")
 
             items = sorted(items.items(), key = lambda x:x[1], reverse = True)
 
@@ -142,17 +145,14 @@ class storageCommand(object):
             for region_z in range(z1 // 512, z2 // 512 + 1):
                 region = RegionFile(os.path.join(region_folder, f"r.{region_x}.{region_z}.mca"))
 
-                for chunk_x in range((x1 - region_x * 512) // 16, (x2 - region_x * 512) // 16 + 1):
-                    for chunk_z in range((z1 - region_z * 512) // 16, (z2 - region_z * 512) // 16 + 1):
-                        chunk = region.get_chunk(chunk_x, chunk_z)["Level"]
-
-                        try:
-                            for tile_entity in chunk["TileEntities"]:
-                                if "Items" in tile_entity and x1 <= tile_entity["x"].value <= x2 and y1 <= tile_entity["y"].value <= y2 and z1 <= tile_entity["z"].value <= z2:
-                                    items = self.get_items_from_nbt(tile_entity, items)
+                for chunk in region.iter_chunks():
+                    try:
+                        for tile_entity in chunk["Level"]["TileEntities"]:
+                            if "Items" in tile_entity and x1 <= tile_entity["x"].value <= x2 and y1 <= tile_entity["y"].value <= y2 and z1 <= tile_entity["z"].value <= z2:
+                                items = self.get_items_from_nbt(tile_entity, items)
                         
-                        except KeyError:
-                            continue
+                    except KeyError:
+                        continue
 
         self.cache[name] = {
             "last_update" : time.time(),
