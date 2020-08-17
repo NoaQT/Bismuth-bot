@@ -31,3 +31,10 @@ class basic(commands.Cog):
     )
     async def search(self, ctx, *args):
         return await searchCommand.command(ctx, args, self.objectives, self.stats_list)
+
+    @commands.command(
+        name="list",
+        help="Display all the currently online players"
+    )
+    async def listCommand(self, ctx):
+        pass #Implemented on the server
