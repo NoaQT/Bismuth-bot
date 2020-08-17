@@ -19,7 +19,7 @@ def get_player_cache(player_list):
     players = {}
     for uuid in tqdm([player["uuid"] for player in player_list], desc="Loading player names"):
         player_name = uuid_to_name(uuid)
-        players[uuid] = player_name if player_name != None else "Yeeted gamer"
+        players[uuid] = player_name if player_name else "Yeeted gamer"
     return players
 
 def generate_image(title, values):
@@ -69,3 +69,18 @@ def generate_image(title, values):
     final_buffer.seek(0)
 
     return discord.File(filename="gay.png", fp=final_buffer)
+
+def generate_embed(author="\u200b", description="", footer_text=""):
+    embed = discord.Embed(
+        colour=0x9e42f5,
+        description= "```" + description + "```"
+    )
+
+    embed.set_author(
+        name=author,
+        icon_url="https://cdn.discordapp.com/icons/635252849571266580/a_a0834de4803ce4a74fa2f7a6d456f39a.png"
+    )
+
+    embed.set_footer(text=footer_text)
+
+    return embed

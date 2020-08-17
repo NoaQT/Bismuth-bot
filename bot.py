@@ -16,24 +16,25 @@ WORLD_FOLDER = os.path.join(SERVER_FOLDER, WORLD_NAME)
 with open(os.path.join(SERVER_FOLDER, "whitelist.json"), "r") as f:
     whitelist = json.load(f)
 
-with open("list.json", "r") as f:
+with open("list.json", "r+") as f:
     player_list = json.load(f)
-
-
-player_list = player_list + [player for player in whitelist if player not in player_list]
-player_cache = utils.get_player_cache(player_list)
-
-with open("list.json", "w") as f:
-    f.write(json.dumps(player_list))
+    player_list = player_list + [player for player in whitelist if player not in player_list]
+    player_cache = utils.get_player_cache(player_list)
+    f.seek(0)
+    f.write(json.dumps(player_list, indent=4))
+    f.truncate()
 
 with open("stats_list.txt", "r") as f:
     stats_list = f.read().split("\n")
 
-Bot = commands.Bot(command_prefix=PREFIX)
+Bot = commands.Bot(
+    command_prefix=PREFIX,
+    case_insensitive=True
+    )
 
 @Bot.event
 async def on_ready():
-    Bot.add_cog(basic.basic(WORLD_FOLDER, player_cache, stats_list))
+    Bot.add_cog(basic.basic(WORLD_FOLDER, player_cache, player_list, stats_list))
 
     print(f'Logged in as {Bot.user.name} - {Bot.user.id}')
     await Bot.change_presence(status=discord.Status.online, activity=discord.Game(name=PREFIX + "help"))
@@ -42,6 +43,8 @@ async def on_ready():
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandNotFound):
         await ctx.send("`Command not found`")
+    elif isinstance(error, commands.errors.CheckFailure):
+        await ctx.send("`insufficient permission`")
     elif isinstance(error, commands.errors.CommandError):
         await ctx.send("`Invalid usage`")
     else:

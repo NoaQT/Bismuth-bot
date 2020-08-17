@@ -1,17 +1,19 @@
 import os
 from nbt import nbt
 from discord.ext import commands
-from commands import scoreCommand, statsCommand, searchCommand
+from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
 class basic(commands.Cog):
-    def __init__(self, world_folder, player_cache, stats_list):
+    def __init__(self, world_folder, player_cache, player_list, stats_list):
+        self.world_folder = world_folder
+        self.player_cache = player_cache
         self.stats_list = stats_list
         self.data_folder = os.path.join(world_folder, "data")
         self.stats_folder = os.path.join(world_folder, "stats")
         nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
         self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
-        self.player_cache = player_cache
-        self.player_names = [player["name"] for player in player_cache]
+        self.player_names = [player["name"] for player in player_list]
+        self.storage_command = storageCommand.storageCommand(self.world_folder)
         
     @commands.command(
     help="Shows all of the scores of the objective and the total"
@@ -38,3 +40,44 @@ class basic(commands.Cog):
     )
     async def listCommand(self, ctx):
         pass #Implemented on the server
+
+    @commands.group(
+        help="Display item counts from survival"
+    )
+    async def storage(self, ctx):
+        if not ctx.invoked_subcommand:
+            raise commands.errors.MissingRequiredArgument
+
+    @storage.command(
+        help="Adds a new storage location"
+    )
+    @commands.has_role(628579235212165120)
+    async def add(self, ctx, dimension: str, name: str, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int):
+        return await self.storage_command.add(ctx, name, dimension, x1, y1, z1, x2, y2, z2)
+
+    @storage.command(
+        help="Removes a storage location"
+    )
+    @commands.has_role(628579235212165120)
+    async def remove(self, ctx, name):
+        return await self.storage_command.remove(ctx, name)
+
+    @storage.command(
+        help="Display items from a storage location",
+        usage="<name> <page>/<item_name>"
+    )
+    async def show(self, ctx, name, arg=None):
+        return await self.storage_command.show(ctx, name, arg)
+
+    @storage.command(
+        help="List all storage locations",
+        name="list"
+    )
+    async def list_locations(self, ctx):
+        return await self.storage_command.list_locations(ctx)
+
+    @storage.command(
+        help="Display info on a storage location"
+    )
+    async def info(self, ctx, name):
+        return await self.storage_command.info(ctx,name)

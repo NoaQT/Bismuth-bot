@@ -1,4 +1,4 @@
-import discord
+import discord, utils
 from discord.ext import commands
 
 async def command(ctx, args, objectives, stat_list):
@@ -45,15 +45,4 @@ async def command(ctx, args, objectives, stat_list):
     footer_text = "Showing page " + \
         str(page) + "/" + str(len(search_result))
 
-    embed = discord.Embed(colour=0x9e42f5,
-                            description= "```" + response + "```"
-                        )
-
-    embed.set_author(
-        name=key if key else "\u200b",
-        icon_url="https://cdn.discordapp.com/icons/635252849571266580/a_a0834de4803ce4a74fa2f7a6d456f39a.png"
-    )
-
-    embed.set_footer(text=footer_text)
-
-    await ctx.send(embed=embed)
+    await ctx.send(embed=utils.generate_embed(key if key else "\u200b", response, footer_text))
