@@ -12,7 +12,10 @@ async def command(ctx, stat_name, stats_folder, player_cache, stats_list):
 
     for file in os.listdir(stats_folder):
         uuid = file[:-5]
-        if uuid not in player_cache: continue
+        if uuid not in player_cache:
+            player_name = utils.uuid_to_name(uuid)
+            player_cache[uuid] = player_name if player_name else "Yeeted gamer"
+            ctx.cog.player_cache = player_cache
         
         with open(os.path.join(stats_folder, file), "r") as f:
             try:

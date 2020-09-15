@@ -17,7 +17,7 @@ def uuid_to_name(uuid):
 
 def get_player_cache(player_list):
     players = {}
-    for uuid in tqdm([player["uuid"] for player in player_list], desc="Loading player names"):
+    for uuid in tqdm(player_list, desc="Loading player names"):
         player_name = uuid_to_name(uuid)
         players[uuid] = player_name if player_name else "Yeeted gamer"
     return players

@@ -4,7 +4,7 @@ from discord.ext import commands
 from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
 class basic(commands.Cog):
-    def __init__(self, world_folder, player_cache, player_list, stats_list, member_role):
+    def __init__(self, world_folder, player_cache, stats_list, member_role):
         self.world_folder = world_folder
         self.player_cache = player_cache
         self.stats_list = stats_list
@@ -13,7 +13,6 @@ class basic(commands.Cog):
         self.stats_folder = os.path.join(world_folder, "stats")
         nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
         self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
-        self.player_names = [player["name"] for player in player_list]
         self.storage_command = storageCommand.storageCommand(self.world_folder)
 
     def is_member(ctx):
@@ -24,7 +23,7 @@ class basic(commands.Cog):
     help="Shows all of the scores of the objective and the total"
     )
     async def score(self, ctx, objective_name):
-        return await scoreCommand.command(ctx, objective_name, self.data_folder, self.player_names, self.objectives)
+        return await scoreCommand.command(ctx, objective_name, self.data_folder, self.objectives)
 
     @commands.command(
     help="Shows a list of all the players values for the statistic and the total"

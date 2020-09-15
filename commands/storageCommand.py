@@ -1,16 +1,15 @@
 import json, os, time, discord, utils
 from datetime import datetime
 from nbt.region import RegionFile
-from discord.ext import commands
 
 class storageCommand(object):
     def __init__(self, world_folder):
         self.world_folder = world_folder
-        self.dimension_dict = {"overworld" : "region", "nether" : "DIM1", "end" : "DIM-1"}
+        self.dimension_dict = {"overworld" : "region", "nether" : os.path.join("DIM-1", "region"), "end" : os.path.join("DIM1", "region")}
 
         with open("config.json", "r") as f:
             cfg = json.load(f)
-        
+
         self.storage_dict = cfg["storage"]
         self.cache = {}
 
@@ -18,7 +17,7 @@ class storageCommand(object):
         with open("config.json", "r+") as f:
             cfg = json.load(f)
             cfg["storage"] = self.storage_dict
-            f.seek(0) 
+            f.seek(0)
             f.write(json.dumps(cfg, indent=4))
             f.truncate()
 
@@ -99,7 +98,6 @@ class storageCommand(object):
 
             items = sorted(items.items(), key = lambda x:x[1], reverse = True)
 
-            response = ""
             items1 = []
             counts = []
             for i in range(page*20 - 1, page*20 + 19):
@@ -115,7 +113,7 @@ class storageCommand(object):
         else:
             footer_text = ""
             author = f"{name} | {arg}"
-            
+
             if arg not in items:
                 items[arg] = 0
 
@@ -150,7 +148,7 @@ class storageCommand(object):
                         for tile_entity in chunk["Level"]["TileEntities"]:
                             if "Items" in tile_entity and x1 <= tile_entity["x"].value <= x2 and y1 <= tile_entity["y"].value <= y2 and z1 <= tile_entity["z"].value <= z2:
                                 items = self.get_items_from_nbt(tile_entity, items)
-                        
+
                     except KeyError:
                         continue
 
@@ -166,7 +164,7 @@ class storageCommand(object):
             iid = item["id"][10:]
             if "shulker_box" in iid and "tag" in item:
                 items = self.get_items_from_nbt(item["tag"]["BlockEntityTag"], items)
-            
+
             else:
                 count = item["Count"].value
                 if iid not in items:
