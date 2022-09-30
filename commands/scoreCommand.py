@@ -1,6 +1,7 @@
 import difflib, os, utils
 from nbt import nbt
 
+
 async def command(ctx, objective_name, data_folder, objectives):
     objective_name = difflib.get_close_matches(objective_name, objectives, 1)
 

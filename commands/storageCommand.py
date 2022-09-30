@@ -2,10 +2,12 @@ import json, os, time, discord, utils
 from datetime import datetime
 from nbt.region import RegionFile
 
-class storageCommand(object):
+
+class StorageCommand(object):
     def __init__(self, world_folder):
         self.world_folder = world_folder
-        self.dimension_dict = {"overworld" : "region", "nether" : os.path.join("DIM-1", "region"), "end" : os.path.join("DIM1", "region")}
+        self.dimension_dict = {"overworld": "region", "nether": os.path.join("DIM-1", "region"),
+                               "end": os.path.join("DIM1", "region")}
 
         with open("config.json", "r") as f:
             cfg = json.load(f)
@@ -35,9 +37,9 @@ class storageCommand(object):
         z1, z2 = sorted((z1, z2))
 
         self.storage_dict[name] = {
-            "dimension" : dimension,
-            "pos1" : [x1, y1, z1],
-            "pos2" : [x2, y2, z2]
+            "dimension": dimension,
+            "pos1": [x1, y1, z1],
+            "pos2": [x2, y2, z2]
         }
         self.save_config()
 
@@ -74,7 +76,8 @@ class storageCommand(object):
         description = f'Dimension: {self.storage_dict[name]["dimension"]}\n'
         description += f'From: {self.storage_dict[name]["pos1"]}\n'
         description += f'To: {self.storage_dict[name]["pos2"]}\n'
-        last_update = datetime.fromtimestamp(self.cache[name]["last_update"]).isoformat(" ", "seconds") if name in self.cache else "NaN"
+        last_update = datetime.fromtimestamp(self.cache[name]["last_update"]).isoformat(" ",
+                                                                                        "seconds") if name in self.cache else "NaN"
         description += f'Last update: {last_update}'
 
         await ctx.send(embed=utils.generate_embed(author, description))
@@ -88,7 +91,7 @@ class storageCommand(object):
         embed = discord.Embed(colour=0x9e42f5)
         if not arg or arg.isdigit():
             page = int(arg) if arg else 1
-            page_count = len(items)//20 + 1
+            page_count = len(items) // 20 + 1
 
             if page > page_count:
                 return await ctx.send(f"`Page {page} doesn't exist`")
@@ -96,11 +99,11 @@ class storageCommand(object):
             if not items:
                 return await ctx.send("`None`")
 
-            items = sorted(items.items(), key = lambda x:x[1], reverse = True)
+            items = sorted(items.items(), key=lambda x: x[1], reverse=True)
 
             items1 = []
             counts = []
-            for i in range(page*20 - 1, page*20 + 19):
+            for i in range(page * 20 - 1, page * 20 + 19):
                 if i >= len(items):
                     break
                 items1.append(items[i][0])
@@ -122,8 +125,8 @@ class storageCommand(object):
         footer_text += f'Last update {datetime.fromtimestamp(self.cache[name]["last_update"]).isoformat(" ", "seconds")}'
 
         embed.set_author(
-            name = author,
-            icon_url = "https://cdn.discordapp.com/icons/635252849571266580/a_a0834de4803ce4a74fa2f7a6d456f39a.png"
+            name=author,
+            icon_url="https://cdn.discordapp.com/icons/635252849571266580/a_a0834de4803ce4a74fa2f7a6d456f39a.png"
         )
 
         embed.set_footer(text=footer_text)
@@ -146,15 +149,16 @@ class storageCommand(object):
                 for chunk in region.iter_chunks():
                     try:
                         for tile_entity in chunk["Level"]["TileEntities"]:
-                            if "Items" in tile_entity and x1 <= tile_entity["x"].value <= x2 and y1 <= tile_entity["y"].value <= y2 and z1 <= tile_entity["z"].value <= z2:
+                            if "Items" in tile_entity and x1 <= tile_entity["x"].value <= x2 and y1 <= tile_entity[
+                                "y"].value <= y2 and z1 <= tile_entity["z"].value <= z2:
                                 items = self.get_items_from_nbt(tile_entity, items)
 
                     except KeyError:
                         continue
 
         self.cache[name] = {
-            "last_update" : time.time(),
-            "items" : items
+            "last_update": time.time(),
+            "items": items
         }
 
         return items
