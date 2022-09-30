@@ -14,7 +14,7 @@ class basic(commands.Cog):
         self.stats_folder = os.path.join(world_folder, "stats")
         nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
         self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
-        self.storage_command = storageCommand.storageCommand(self.world_folder)
+        self.storage_command = storageCommand.StorageCommand(self.world_folder)
 
     def is_member(ctx):
         role = ctx.guild.get_role(ctx.cog.member_role)
