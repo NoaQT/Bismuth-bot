@@ -1,4 +1,7 @@
-import difflib, os, utils
+import difflib
+import os
+import utils
+
 from nbt import nbt
 
 
