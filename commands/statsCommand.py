@@ -1,5 +1,6 @@
 import os, json, difflib, utils
 
+
 async def command(ctx, stat_name, stats_folder, player_cache, stats_list):
     stat_name = difflib.get_close_matches(stat_name, stats_list, 1)
 
@@ -16,7 +17,7 @@ async def command(ctx, stat_name, stats_folder, player_cache, stats_list):
             player_name = utils.uuid_to_name(uuid)
             player_cache[uuid] = player_name if player_name else "Yeeted gamer"
             ctx.cog.player_cache = player_cache
-        
+
         with open(os.path.join(stats_folder, file), "r") as f:
             try:
                 value = json.load(f)[stat_name]
@@ -26,10 +27,10 @@ async def command(ctx, stat_name, stats_folder, player_cache, stats_list):
                 continue
             except json.decoder.JSONDecodeError:
                 continue
-        
+
     name_split = stat_name.split(".")
     if len(name_split) > 3:
         stat_name = name_split[1] + " " + name_split[3]
-        
+
     f = utils.generate_image(stat_name, stats)
     await ctx.send(file=f)

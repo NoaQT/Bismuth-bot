@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
-import os, discord, json, utils
-from commands import basic
+import discord
+import json
+import os
+import utils
+
 from discord.ext import commands
+
+from commands import basic
 
 with open("config.json", "r") as f:
     cfg = json.load(f)
@@ -20,17 +25,22 @@ player_cache = utils.get_player_cache(uuid_list)
 with open("stats_list.txt", "r") as f:
     stats_list = f.read().split("\n")
 
+intents = discord.Intents.all()
+
 Bot = commands.Bot(
     command_prefix=PREFIX,
-    case_insensitive=True
-    )
+    case_insensitive=True,
+    intents=intents
+)
+
 
 @Bot.event
 async def on_ready():
-    Bot.add_cog(basic.basic(WORLD_FOLDER, player_cache, stats_list, MEMBER_ROLE))
+    await Bot.add_cog(basic.basic(WORLD_FOLDER, player_cache, stats_list, MEMBER_ROLE))
 
     print(f'Logged in as {Bot.user.name} - {Bot.user.id}')
     await Bot.change_presence(status=discord.Status.online, activity=discord.Game(name=PREFIX + "help"))
+
 
 @Bot.event
 async def on_command_error(ctx, error):
@@ -43,9 +53,11 @@ async def on_command_error(ctx, error):
     else:
         raise error
 
+
 @Bot.event
 async def on_command(ctx):
     print(f"{ctx.message.created_at} {ctx.message.author} {ctx.message.content}")
+
 
 print("Starting bot")
 Bot.run(TOKEN)

@@ -1,6 +1,7 @@
 import discord, utils
 from discord.ext import commands
 
+
 async def command(ctx, args, objectives, stat_list):
     if not args:
         raise commands.errors.MissingRequiredArgument
@@ -43,6 +44,6 @@ async def command(ctx, args, objectives, stat_list):
 
     response = str(search_result[page - 1])[1:][:-1].replace("'", "")
     footer_text = "Showing page " + \
-        str(page) + "/" + str(len(search_result))
+                  str(page) + "/" + str(len(search_result))
 
     await ctx.send(embed=utils.generate_embed(key if key else "\u200b", response, footer_text))

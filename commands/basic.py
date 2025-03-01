@@ -3,6 +3,7 @@ from nbt import nbt
 from discord.ext import commands
 from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
+
 class basic(commands.Cog):
     def __init__(self, world_folder, player_cache, stats_list, member_role):
         self.world_folder = world_folder
@@ -13,27 +14,27 @@ class basic(commands.Cog):
         self.stats_folder = os.path.join(world_folder, "stats")
         nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
         self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
-        self.storage_command = storageCommand.storageCommand(self.world_folder)
+        self.storage_command = storageCommand.StorageCommand(self.world_folder)
 
     def is_member(ctx):
         role = ctx.guild.get_role(ctx.cog.member_role)
         return role in ctx.message.author.roles
-        
+
     @commands.command(
-    help="Shows all of the scores of the objective and the total"
+        help="Shows all of the scores of the objective and the total"
     )
     async def score(self, ctx, objective_name):
         return await scoreCommand.command(ctx, objective_name, self.data_folder, self.objectives)
 
     @commands.command(
-    help="Shows a list of all the players values for the statistic and the total"
+        help="Shows a list of all the players values for the statistic and the total"
     )
     async def stat(self, ctx, stat_name):
         return await statsCommand.command(ctx, stat_name, self.stats_folder, self.player_cache, self.stats_list)
 
     @commands.command(
-    help="List all the statistic/objectives with the key",
-    usage="stat/objective key page"
+        help="List all the statistic/objectives with the key",
+        usage="stat/objective key page"
     )
     async def search(self, ctx, *args):
         return await searchCommand.command(ctx, args, self.objectives, self.stats_list)
@@ -43,7 +44,7 @@ class basic(commands.Cog):
         help="Display all the currently online players"
     )
     async def listCommand(self, ctx):
-        pass #Implemented on the server
+        pass  # Implemented on the server
 
     @commands.group(
         help="Display item counts from survival"
@@ -84,4 +85,4 @@ class basic(commands.Cog):
         help="Display info on a storage location"
     )
     async def info(self, ctx, name):
-        return await self.storage_command.info(ctx,name)
+        return await self.storage_command.info(ctx, name)

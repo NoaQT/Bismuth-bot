@@ -1,6 +1,12 @@
-import json, requests, os, discord, math, io
+import discord
+import io
+import json
+import math
+import requests
+
 from PIL import ImageFont, ImageDraw, Image
 from tqdm import tqdm
+
 
 def uuid_to_name(uuid):
     try:
@@ -9,11 +15,12 @@ def uuid_to_name(uuid):
         re = requests.get(url)
         if re:
             re = json.loads(re.text)
-            return re[len(re)-1]["name"]
+            return re[len(re) - 1]["name"]
         else:
             return None
     except:
         return None
+
 
 def get_player_cache(player_list):
     players = {}
@@ -22,13 +29,13 @@ def get_player_cache(player_list):
         players[uuid] = player_name if player_name else "Yeeted gamer"
     return players
 
-def generate_image(title, values):
 
+def generate_image(title, values):
     players = ""
     scores = ""
     total = 0
 
-    for player, score in sorted(values.items(), key = lambda x:x[1], reverse = True):
+    for player, score in sorted(values.items(), key=lambda x: x[1], reverse=True):
         players += player + "\n"
         scores += str(score) + "\n"
         total += score
@@ -39,9 +46,9 @@ def generate_image(title, values):
     red = "#FF5555"
     white = "#FFFFFF"
     spacing = -1
-    font = ImageFont.truetype(font="minecraft.ttf", size = 20)
+    font = ImageFont.truetype(font="minecraft.ttf", size=20)
 
-    draw = ImageDraw.Draw(Image.new("1", (1,1)))
+    draw = ImageDraw.Draw(Image.new("1", (1, 1)))
 
     title_size = draw.textsize(text=title, font=font)
     players_size = draw.multiline_textsize(text=players, font=font, spacing=spacing)
@@ -70,10 +77,11 @@ def generate_image(title, values):
 
     return discord.File(filename="gay.png", fp=final_buffer)
 
+
 def generate_embed(author="\u200b", description="", footer_text=""):
     embed = discord.Embed(
         colour=0x9e42f5,
-        description= "```" + description + "```"
+        description="```" + description + "```"
     )
 
     embed.set_author(
