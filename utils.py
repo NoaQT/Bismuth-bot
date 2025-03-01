@@ -25,6 +25,7 @@ def uuid_to_name(uuid):
 def get_player_cache(player_list):
     players = {}
     for uuid in tqdm(player_list, desc="Loading player names"):
+        break
         player_name = uuid_to_name(uuid)
         players[uuid] = player_name if player_name else "Yeeted gamer"
     return players
@@ -50,12 +51,16 @@ def generate_image(title, values):
 
     draw = ImageDraw.Draw(Image.new("1", (1, 1)))
 
-    title_size = draw.textsize(text=title, font=font)
-    players_size = draw.multiline_textsize(text=players, font=font, spacing=spacing)
-    scores_size = draw.multiline_textsize(text=scores, font=font, spacing=spacing)
+    title_bb = draw.textbbox((0, 0), text=title, font=font)
+    players_bb = draw.multiline_textbbox((0, 0), text=players, font=font, spacing=spacing)
+    scores_bb = draw.multiline_textbbox((0, 0), text=scores, font=font, spacing=spacing)
+
+    title_size = title_bb[2] - title_bb[0], title_bb[3] - title_bb[1] 
+    players_size = players_bb[2] - players_bb[0], players_bb[3] - players_bb[1] 
+    scores_size = scores_bb[2] - scores_bb[0], scores_bb[3] - scores_bb[1] 
 
     width = players_size[0] + scores_size[0] + 20
-    height = players_size[1] + 19
+    height = scores_size[1] + 19
 
     image = Image.new("RGB", (width, height), color="#2c2f33")
 
@@ -64,7 +69,7 @@ def generate_image(title, values):
     title_pos = (math.floor((width - title_size[0]) / 2), -3)
     players_pos = (2, 14)
     scores_pos = (width - scores_size[0] - 1, 14)
-    total_pos = (2, players_size[1] - 4)
+    total_pos = (2, scores_size[1] + 1)
 
     draw.text(title_pos, text=title, font=font, fill=white)
     draw.text(total_pos, text="Total", font=font, fill=white)
