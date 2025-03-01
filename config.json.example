@@ -1,0 +1,13 @@
+{
+    "bot": {
+        "token": "",
+        "prefix": ";",
+        "member_role": ""
+    },
+    "server": {
+        "path_to_server_folder": "",
+        "world_name": ""
+    },
+    "storage": {
+    }
+}
