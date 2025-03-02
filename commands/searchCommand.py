@@ -3,10 +3,11 @@ from discord.ext import commands
 
 
 async def command(interaction, target, key, page, objectives, stat_list):
+    if page < 1: page = 1
     search_list = []
     if target == "stat":
         search_list = stat_list
-    elif query == "objective":
+    elif target == "objective":
         search_list = objectives
     else:
         await interaction.response.send_message("`Can only search for statistics or objectives`")

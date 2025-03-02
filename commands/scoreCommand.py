@@ -6,9 +6,7 @@ from nbt import nbt
 
 
 async def command(interaction, objective_name, data_folder, objectives):
-    objective_name = difflib.get_close_matches(objective_name, objectives, 1)
-
-    if not objective_name:
+    if objective_name not in objectives:
         await interaction.response.send_message("`Scoreboard not found`")
         return
 

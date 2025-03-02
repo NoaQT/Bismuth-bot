@@ -1,16 +1,12 @@
 import os, json, difflib, utils
 
 
-async def command(interaction, stat_name, db_engine, stats_folder, player_cache, stats_list):
-    stat_name = difflib.get_close_matches(stat_name, stats_list, 1)
-
-    if not stat_name:
+async def command(interaction, stat_name, db_engine, stats_folder, stats_list):
+    if stat_name not in stats_list:
         await interaction.response.send_message("`Stat not found`")
         return
 
-    stat_name = stat_name[0]
     stats = {}
-
     for file in os.listdir(stats_folder):
         with open(os.path.join(stats_folder, file), "r") as f:
             try:
