@@ -1,6 +1,7 @@
 import os
 from nbt import nbt
 from discord.ext import commands
+from discord import app_commands
 from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
 
@@ -21,69 +22,63 @@ class basic(commands.Cog):
         role = ctx.guild.get_role(ctx.cog.member_role)
         return role in ctx.message.author.roles
 
-    @commands.command(
-        help="Shows all of the scores of the objective and the total"
+    @app_commands.command(
+        description="Shows all of the scores of the objective and the total"
     )
-    async def score(self, ctx, objective_name):
-        return await scoreCommand.command(ctx, objective_name, self.data_folder, self.objectives)
+    async def score(self, interaction, objective: str):
+        return await scoreCommand.command(interaction, objective, self.data_folder, self.objectives)
 
-    @commands.command(
-        help="Shows a list of all the players values for the statistic and the total"
+    @app_commands.command(
+        description="Shows a list of all the players values for the statistic and the total"
     )
-    async def stat(self, ctx, stat_name):
-        return await statsCommand.command(ctx, stat_name, self.stats_folder, self.player_cache, self.stats_list)
+    async def stat(self, interaction, stat: str):
+        return await statsCommand.command(interaction, stat, self.db_engine, self.stats_folder, self.player_cache, self.stats_list)
 
-    @commands.command(
-        help="List all the statistic/objectives with the key",
-        usage="stat/objective key page"
+    @app_commands.command(
+        description="List all the statistic/objectives with the key",
     )
-    async def search(self, ctx, *args):
-        return await searchCommand.command(ctx, args, self.objectives, self.stats_list)
+    async def search(self, interaction, target: str, key: str, page: int):
+        return await searchCommand.command(interaction, target, key, page, self.objectives, self.stats_list)
 
-    @commands.command(
+    @app_commands.command(
         name="list",
-        help="Display all the currently online players"
+        description="Display all the currently online players"
     )
-    async def listCommand(self, ctx):
+    async def listCommand(self, interaction):
         pass  # Implemented on the server
 
-    @commands.group(
-        help="Display item counts from survival"
-    )
-    async def storage(self, ctx):
-        if not ctx.invoked_subcommand:
-            raise commands.errors.MissingRequiredArgument
+    storage = app_commands.Group(name="storage", description="Display item counts from survival")
 
     @storage.command(
-        help="Adds a new storage location"
+        description="Adds a new storage location"
     )
     @commands.check(is_member)
-    async def add(self, ctx, dimension: str, name: str, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int):
-        return await self.storage_command.add(ctx, name, dimension, x1, y1, z1, x2, y2, z2)
+    async def add(self, interaction, dimension: str, name: str, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int):
+        return await self.storage_command.add(interaction, name, dimension, x1, y1, z1, x2, y2, z2)
 
     @storage.command(
-        help="Removes a storage location"
+        description="Removes a storage location"
     )
     @commands.check(is_member)
-    async def remove(self, ctx, name):
-        return await self.storage_command.remove(ctx, name)
+    async def remove(self, interaction, name: str):
+        return await self.storage_command.remove(interaction, name)
 
     @storage.command(
-        help="Display items from a storage location",
-        usage="<name> <page>/<item_name>"
+        description="Display items from a storage location",
     )
-    async def show(self, ctx, name, arg=None):
-        return await self.storage_command.show(ctx, name, arg)
+    async def show(self, interaction, name: str, arg: str=None):
+        return await self.storage_command.show(interaction, name, arg)
 
     @storage.command(
-        help="List all storage locations",
+        description="List all storage locations",
         name="list"
     )
-    async def list_locations(self, ctx):
-        return await self.storage_command.list_locations(ctx)
+    async def list_locations(self, interaction):
+        return await self.storage_command.list_locations(interaction)
 
     @storage.command(
-        help="Display info on a storage location"
+        description="Display info on a storage location"
     )
-    async def info(self, ctx, name):
-        return await self.storage_command.info(ctx, name)
+    async def info(self, interaction, name: str):
+        return await self.storage_command.info(interaction, name)
+

@@ -5,11 +5,11 @@ import utils
 from nbt import nbt
 
 
-async def command(ctx, objective_name, data_folder, objectives):
+async def command(interaction, objective_name, data_folder, objectives):
     objective_name = difflib.get_close_matches(objective_name, objectives, 1)
 
     if not objective_name:
-        await ctx.send("`Scoreboard not found`")
+        await interaction.response.send_message("`Scoreboard not found`")
         return
 
     objective_name = objective_name[0]
@@ -22,4 +22,4 @@ async def command(ctx, objective_name, data_folder, objectives):
             scores[player["Name"].value] = player["Score"].value
 
     image = utils.generate_image(objective_name, scores)
-    await ctx.send(file=image)
+    await interaction.response.send_message(file=image)

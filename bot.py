@@ -45,6 +45,8 @@ async def on_ready():
     print(f'Logged in as {Bot.user.name} - {Bot.user.id}')
     await Bot.change_presence(status=discord.Status.online, activity=discord.Game(name=PREFIX + "help"))
 
+    synced = await Bot.tree.sync()
+    print(synced)
     await utils.refresh_player_names(db_engine)
 
 
