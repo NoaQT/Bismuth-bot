@@ -3,7 +3,7 @@ import difflib
 from nbt import nbt
 from discord.ext import commands
 from discord import app_commands
-from commands import scoreCommand, statsCommand, searchCommand, storageCommand
+from commands import scoreCommand, statsCommand, searchCommand, storageCommand, serverCommand
 
 
 class basic(commands.Cog):
@@ -58,6 +58,22 @@ class basic(commands.Cog):
     )
     async def listCommand(self, interaction):
         pass  # Implemented on the server
+
+    server = app_commands.Group(name="server", description="Manage servers")
+
+    @server.command(
+        name="add",
+        description="Add an already existing server",
+    )
+    async def server_add(self, interaction, name: str, path: str):
+        await serverCommand.add(interaction, name, path, self.db_engine)
+
+    @server.command(
+        name="list",
+        description="List servers",
+    )
+    async def server_list(self, interaction):
+        await serverCommand.list(interaction, self.db_engine)
 
     storage = app_commands.Group(name="storage", description="Display item counts from survival")
 
