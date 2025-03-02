@@ -37,4 +37,4 @@ async def command(interaction, target, key, page, objectives, stat_list):
     footer_text = "Showing page " + \
                   str(page) + "/" + str(len(search_result))
 
-    await interaction.response.send_message(embed=utils.generate_embed(key if key else "\u200b", response, footer_text))
+    await interaction.response.send_message(embed=utils.generate_embed(key if key else "\u200b", response, footer_text, interaction.guild.icon and interaction.guild.icon.url))

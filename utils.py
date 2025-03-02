@@ -109,7 +109,7 @@ def generate_image(title, values):
     return discord.File(filename="gay.png", fp=final_buffer)
 
 
-def generate_embed(author="\u200b", description="", footer_text=""):
+def generate_embed(author="\u200b", description="", footer_text="", icon_url=""):
     embed = discord.Embed(
         colour=0x9e42f5,
         description="```" + description + "```"
@@ -117,7 +117,7 @@ def generate_embed(author="\u200b", description="", footer_text=""):
 
     embed.set_author(
         name=author,
-        icon_url="https://cdn.discordapp.com/icons/635252849571266580/a_a0834de4803ce4a74fa2f7a6d456f39a.png"
+        icon_url=icon_url
     )
 
     embed.set_footer(text=footer_text)
