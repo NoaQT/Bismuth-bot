@@ -10,6 +10,18 @@ from tqdm import tqdm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from db.models import Player
+from tqdm import tqdm
+
+
+async def refresh_player_names(db_engine):
+    while True:
+        with Session(db_engine) as session:
+            for player in tqdm(session.scalars(select(Player)).all(), desc="Updating player names"):
+                player.name = await uuid_to_name(player.uuid)
+
+            session.commit()
+
+        await asyncio.sleep(60 * 24)
 
 
 async def uuid_to_name(uuid):
@@ -18,7 +30,7 @@ async def uuid_to_name(uuid):
         url = f"https://api.minecraftservices.com/minecraft/profile/lookup/{uuid.replace('-', '')}"
         res = requests.get(url)
         if not res.ok:
-            await asyncio.sleep(10)
+            await asyncio.sleep(30)
             retries -= 1
             continue
 
