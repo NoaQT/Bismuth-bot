@@ -12,16 +12,10 @@ async def command(ctx, stat_name, stats_folder, player_cache, stats_list):
     stats = {}
 
     for file in os.listdir(stats_folder):
-        uuid = file[:-5]
-        if uuid not in player_cache:
-            player_name = utils.uuid_to_name(uuid)
-            player_cache[uuid] = player_name if player_name else "Yeeted gamer"
-            ctx.cog.player_cache = player_cache
-
         with open(os.path.join(stats_folder, file), "r") as f:
             try:
                 value = json.load(f)[stat_name]
-                player_name = player_cache[uuid]
+                player_name = await utils.get_player_name(ctx.cog.db_engine, file[:-5])
                 stats[player_name] = value
             except KeyError:
                 continue

@@ -8,6 +8,9 @@
         "path_to_server_folder": "",
         "world_name": ""
     },
+    "database": {
+        "conn": "engine://user:pass@host:port/db"
+    },
     "storage": {
     }
 }

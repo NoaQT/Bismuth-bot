@@ -3,32 +3,46 @@ import io
 import json
 import math
 import requests
+import asyncio
 
 from PIL import ImageFont, ImageDraw, Image
 from tqdm import tqdm
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from db.models import Player
 
 
-def uuid_to_name(uuid):
-    try:
-        if "-" in uuid: uuid = uuid.replace("-", "")
-        url = "https://api.mojang.com/user/profiles/" + uuid + "/names"
-        re = requests.get(url)
-        if re:
-            re = json.loads(re.text)
-            return re[len(re) - 1]["name"]
-        else:
+async def uuid_to_name(uuid):
+    retries = 5
+    while retries:
+        url = f"https://api.minecraftservices.com/minecraft/profile/lookup/{uuid.replace('-', '')}"
+        res = requests.get(url)
+        if not res.ok:
+            await asyncio.sleep(10)
+            retries -= 1
+            continue
+
+        res = res.json()
+        if "error" in res:
             return None
-    except:
-        return None
+
+        return res["name"]
 
 
-def get_player_cache(player_list):
-    players = {}
-    for uuid in tqdm(player_list, desc="Loading player names"):
-        break
-        player_name = uuid_to_name(uuid)
-        players[uuid] = player_name if player_name else "Yeeted gamer"
-    return players
+async def get_player_name(db_engine, uuid):
+    with Session(db_engine) as session:
+        player = session.scalars(
+            select(Player).where(Player.uuid == uuid)
+        ).first()
+
+        if player:
+            name = player.name
+        else:
+            name = await uuid_to_name(uuid) or "Yeeted gamer"
+            session.add(Player(name=name, uuid=uuid))
+            session.commit()
+
+    return name
 
 
 def generate_image(title, values):

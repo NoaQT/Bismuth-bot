@@ -3,3 +3,4 @@ NBT==1.5.1
 Pillow==11.1.0
 requests==2.32.3
 tqdm==4.67.1
+sqlalchemy==2.0.38

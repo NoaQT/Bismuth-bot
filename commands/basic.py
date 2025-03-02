@@ -5,9 +5,10 @@ from commands import scoreCommand, statsCommand, searchCommand, storageCommand
 
 
 class basic(commands.Cog):
-    def __init__(self, world_folder, player_cache, stats_list, member_role):
+    def __init__(self, world_folder, db_engine, stats_list, member_role):
         self.world_folder = world_folder
-        self.player_cache = player_cache
+        self.db_engine = db_engine
+        self.player_cache = {}
         self.stats_list = stats_list
         self.member_role = member_role
         self.data_folder = os.path.join(world_folder, "data")
