@@ -1,17 +1,13 @@
 import discord, utils
 from discord.ext import commands
+from .common import Pagination
 
 
-async def command(interaction, target, key, page, objectives, stat_list):
-    if page < 1: page = 1
-    search_list = []
-    if target == "stat":
+async def command(interaction, target, key, objectives, stat_list):
+    if target == "Statistics":
         search_list = stat_list
-    elif target == "objective":
-        search_list = objectives
     else:
-        await interaction.response.send_message("`Can only search for statistics or objectives`")
-        return
+        search_list = objectives
 
     search_result = []
     temp = []
@@ -30,12 +26,8 @@ async def command(interaction, target, key, page, objectives, stat_list):
     if temp:
         search_result.append(temp)
 
-    if page > len(search_result):
-        await interaction.response.send_message("`None found`")
-        return
+    async def get_page(page: int):
+        response = str(search_result[page - 1])[1:][:-1].replace("'", "")
+        return utils.generate_embed(f"{target}: {key if key else '\u200b'}", response, icon_url=interaction.guild.icon and interaction.guild.icon.url)
 
-    response = str(search_result[page - 1])[1:][:-1].replace("'", "")
-    footer_text = "Showing page " + \
-                  str(page) + "/" + str(len(search_result))
-
-    await interaction.response.send_message(embed=utils.generate_embed(key if key else "\u200b", response, footer_text, interaction.guild.icon and interaction.guild.icon.url))
+    return await Pagination(interaction, get_page, len(search_result)).view()

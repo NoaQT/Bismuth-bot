@@ -46,11 +46,11 @@ class basic(commands.Cog):
         description="List all the statistic/objectives with the key",
     )
     @app_commands.choices(target=[
-        app_commands.Choice(name="Objectives", value="objective"),
-        app_commands.Choice(name="Statistics", value="stat")
+        app_commands.Choice(name="Objectives", value="Objectives"),
+        app_commands.Choice(name="Statistics", value="Statistics"),
     ])
-    async def search(self, interaction, target: str, key: str, page: int=1):
-        return await searchCommand.command(interaction, target, key, page, self.objectives, self.stats_list)
+    async def search(self, interaction, target: str, query: str):
+        return await searchCommand.command(interaction, target, query, self.objectives, self.stats_list)
 
     @app_commands.command(
         name="list",
