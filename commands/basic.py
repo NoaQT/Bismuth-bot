@@ -65,8 +65,8 @@ class basic(commands.Cog):
         name="add",
         description="Add an already existing server",
     )
-    async def server_add(self, interaction, name: str, path: str):
-        await serverCommand.add(interaction, name, path, self.db_engine)
+    async def server_add(self, interaction, name: str, path: str, hostname: str):
+        await serverCommand.add(interaction, name, path, hostname, self.db_engine)
 
     @server.command(
         name="list",

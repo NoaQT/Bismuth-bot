@@ -21,9 +21,6 @@ SERVER_FOLDER = cfg["server"]["path_to_server_folder"]
 WORLD_NAME = cfg["server"]["world_name"]
 WORLD_FOLDER = os.path.join(SERVER_FOLDER, WORLD_NAME)
 
-# uuid_list = [file[:-5] for file in os.listdir(os.path.join(WORLD_FOLDER, "stats"))]
-# player_cache = utils.get_player_cache(uuid_list)
-
 with open("stats_list.txt", "r") as f:
     stats_list = f.read().split("\n")
 

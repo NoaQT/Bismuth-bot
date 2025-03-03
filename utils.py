@@ -123,3 +123,16 @@ def generate_embed(author="\u200b", description="", footer_text="", icon_url="")
     embed.set_footer(text=footer_text)
 
     return embed
+
+
+def parse_properties(path):
+    res = {}
+    with open(path) as f:
+        for line in f.readlines():
+            if line.startswith("#") or "=" not in line:
+                continue
+
+            line_split = line.split("=")
+            res[line_split[0]] = line_split[1]
+
+    return res

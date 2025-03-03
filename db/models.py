@@ -23,4 +23,5 @@ class Server(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     path: Mapped[str] = mapped_column(unique=True)
+    hostname: Mapped[str] = mapped_column(unique=True)
     default: Mapped[bool] = mapped_column(default=False)
