@@ -1,21 +1,11 @@
-import difflib
-import os
 import utils
+from commands.common.server import get_or_default, scoreboard_nbt
 
-from nbt import nbt
 
-
-async def command(interaction, objective_name, data_folder, objectives):
-    if objective_name not in objectives:
-        await interaction.response.send_message("`Scoreboard not found`")
-        return
-
-    objective_name = objective_name[0]
-
+async def command(interaction, objective_name, server_id, db_engine):
     scores = {}
-
-    nbt_file = nbt.NBTFile(os.path.join(data_folder, "scoreboard.dat"))["data"]
-    for player in nbt_file["PlayerScores"]:
+    nbt_file = scoreboard_nbt(get_or_default(db_engine, server_id))
+    for player in nbt_file["data"]["PlayerScores"]:
         if player["Objective"].value == objective_name and player["Name"].value != "Total":
             scores[player["Name"].value] = player["Score"].value
 

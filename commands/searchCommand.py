@@ -1,13 +1,16 @@
 import discord, utils
-from discord.ext import commands
-from .common import Pagination
+from sqlalchemy.util import await_only
+
+from commands.common import Pagination
+from commands.common.server import get_or_default, scoreboard_nbt
 
 
-async def command(interaction, target, key, objectives, stat_list):
+async def command(interaction, target, key, server_id, db_engine, stat_list):
     if target == "Statistics":
         search_list = stat_list
     else:
-        search_list = objectives
+        nbt_file = scoreboard_nbt(get_or_default(db_engine, server_id))
+        search_list = [objective['Name'].value for objective in nbt_file["data"]["Objectives"]]
 
     search_result = []
     temp = []
@@ -29,5 +32,8 @@ async def command(interaction, target, key, objectives, stat_list):
     async def get_page(page: int):
         response = str(search_result[page - 1])[1:][:-1].replace("'", "")
         return utils.generate_embed(f"{target}: {key if key else '\u200b'}", response, icon_url=interaction.guild.icon and interaction.guild.icon.url)
+
+    if not search_result:
+        return await interaction.response.send_message("No results")
 
     return await Pagination(interaction, get_page, len(search_result)).view()

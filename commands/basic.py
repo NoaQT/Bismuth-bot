@@ -1,36 +1,44 @@
 import os
 import difflib
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 from nbt import nbt
 from discord.ext import commands
 from discord import app_commands
 from commands import scoreCommand, statsCommand, searchCommand, storageCommand, serverCommand
+from db.models import Server
+from commands import common
 
 
 class basic(commands.Cog):
-    def __init__(self, world_folder, db_engine, stats_list, member_role):
-        self.world_folder = world_folder
+    def __init__(self, db_engine, stats_list, member_role):
         self.db_engine = db_engine
         self.stats_list = stats_list
         self.member_role = member_role
-        self.data_folder = os.path.join(world_folder, "data")
-        self.stats_folder = os.path.join(world_folder, "stats")
-        nbt_file = nbt.NBTFile(os.path.join(self.data_folder, "scoreboard.dat"))["data"]
-        self.objectives = [objective['Name'].value for objective in nbt_file["Objectives"]]
-        self.storage_command = storageCommand.StorageCommand(self.world_folder)
+        self.storage_command = storageCommand.StorageCommand("")
 
     def is_member(ctx):
         role = ctx.guild.get_role(ctx.cog.member_role)
         return role in ctx.message.author.roles
 
+    async def server_auto(self, interaction, current):
+        with Session(self.db_engine) as session:
+            servers = session.scalars(select(Server).where(Server.name.like(f"%{current}%")).limit(25)).all()
+
+        return [app_commands.Choice(name=s.name, value=s.id) for s in servers]
+
     async def objective_auto(self, interaction, current):
-        return [app_commands.Choice(name=obj, value=obj) for obj in difflib.get_close_matches(current, self.objectives, 25, 0)]
+        server = common.server.get_or_default(self.db_engine, interaction.namespace.server)
+        nbt_file = common.server.scoreboard_nbt(server)
+        objectives = [objective['Name'].value for objective in nbt_file["data"]["Objectives"]]
+        return [app_commands.Choice(name=obj, value=obj) for obj in difflib.get_close_matches(current, objectives, 25, 0)]
 
     @app_commands.command(
         description="Shows all of the scores of the objective and the total"
     )
-    @app_commands.autocomplete(objective=objective_auto)
-    async def score(self, interaction, objective: str):
-        return await scoreCommand.command(interaction, objective, self.data_folder, self.objectives)
+    @app_commands.autocomplete(server=server_auto, objective=objective_auto)
+    async def score(self, interaction, objective: str, server: int=None):
+        return await scoreCommand.command(interaction, objective, server, self.db_engine)
 
     async def stat_auto(self, interaction, current):
         return [app_commands.Choice(name=x, value=x) for x in difflib.get_close_matches(current, self.stats_list, 25, 0)]
@@ -38,9 +46,9 @@ class basic(commands.Cog):
     @app_commands.command(
         description="Shows a list of all the players values for the statistic and the total"
     )
-    @app_commands.autocomplete(stat=stat_auto)
-    async def stat(self, interaction, stat: str):
-        return await statsCommand.command(interaction, stat, self.db_engine, self.stats_folder, self.stats_list)
+    @app_commands.autocomplete(stat=stat_auto, server=server_auto)
+    async def stat(self, interaction, stat: str, server: int=None):
+        return await statsCommand.command(interaction, stat, server, self.db_engine)
 
     @app_commands.command(
         description="List all the statistic/objectives with the key",
@@ -49,8 +57,9 @@ class basic(commands.Cog):
         app_commands.Choice(name="Objectives", value="Objectives"),
         app_commands.Choice(name="Statistics", value="Statistics"),
     ])
-    async def search(self, interaction, target: str, query: str):
-        return await searchCommand.command(interaction, target, query, self.objectives, self.stats_list)
+    @app_commands.autocomplete(server=server_auto)
+    async def search(self, interaction, target: str, query: str, server: int=None):
+        return await searchCommand.command(interaction, target, query, server, self.db_engine, self.stats_list)
 
     @app_commands.command(
         name="list",

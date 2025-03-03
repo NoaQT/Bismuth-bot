@@ -17,9 +17,6 @@ with open("config.json", "r") as f:
 TOKEN = cfg["bot"]["token"]
 PREFIX = cfg["bot"]["prefix"]
 MEMBER_ROLE = cfg["bot"]["member_role"]
-SERVER_FOLDER = cfg["server"]["path_to_server_folder"]
-WORLD_NAME = cfg["server"]["world_name"]
-WORLD_FOLDER = os.path.join(SERVER_FOLDER, WORLD_NAME)
 
 with open("stats_list.txt", "r") as f:
     stats_list = f.read().split("\n")
@@ -37,7 +34,7 @@ models.Base.metadata.create_all(db_engine)
 
 @Bot.event
 async def on_ready():
-    await Bot.add_cog(basic.basic(WORLD_FOLDER, db_engine, stats_list, MEMBER_ROLE))
+    await Bot.add_cog(basic.basic(db_engine, stats_list, MEMBER_ROLE))
 
     print(f'Logged in as {Bot.user.name} - {Bot.user.id}')
     await Bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Bismuth"))

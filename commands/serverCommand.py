@@ -20,7 +20,9 @@ async def add(interaction, name, path, hostname, db):
         if res.first():
             return await interaction.response.send_message("Server already exists")
 
-        session.add(Server(name=name, path=path, hostname=hostname))
+        default = session.scalars(select(Server).where(Server.default)).first()
+
+        session.add(Server(name=name, path=path, hostname=hostname, default=default is None))
         session.commit()
 
     await interaction.response.send_message("Server added")
@@ -34,8 +36,8 @@ async def list(interaction, db):
     async def get_page(page):
         emb = discord.Embed(colour=0x9e42f5)
         emb.set_author(name="Servers", icon_url=interaction.guild.icon.url)
-        servers_page = servers[(page - 1) * per_page:page * per_page]
 
+        servers_page = servers[(page - 1) * per_page:page * per_page]
         emb.add_field(name="Name", value="\n".join(s.name for s in servers_page), inline=True)
         emb.add_field(name="Host", value="\n".join(s.hostname for s in servers_page), inline=True)
 

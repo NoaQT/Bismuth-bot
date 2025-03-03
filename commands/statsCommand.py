@@ -1,10 +1,9 @@
-import os, json, difflib, utils
+import os, json, utils
+from commands.common.server import world_path, get_or_default
 
 
-async def command(interaction, stat_name, db_engine, stats_folder, stats_list):
-    if stat_name not in stats_list:
-        await interaction.response.send_message("`Stat not found`")
-        return
+async def command(interaction, stat_name, server_id, db_engine):
+    stats_folder = os.path.join(world_path(get_or_default(db_engine, server_id)), "stats")
 
     stats = {}
     for file in os.listdir(stats_folder):
