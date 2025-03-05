@@ -17,11 +17,15 @@ async def refresh_player_names(db_engine):
     while True:
         with Session(db_engine) as session:
             for player in tqdm(session.scalars(select(Player)).all(), desc="Updating player names"):
-                player.name = await uuid_to_name(player.uuid)
+                try:
+                    player.name = await uuid_to_name(player.uuid)
+                except Exception as e:
+                    print(e)
+                    continue
 
             session.commit()
 
-        await asyncio.sleep(60 * 24)
+        await asyncio.sleep(60 * 60 * 24)
 
 
 async def uuid_to_name(uuid):

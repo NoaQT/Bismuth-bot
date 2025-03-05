@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, or_
 
 from db.models import Server
-from .common import Pagination
+from commands.common import Pagination, MCQuery
+from commands.common.server import get_or_default
 from utils import parse_properties
 
 
@@ -44,4 +45,34 @@ async def list(interaction, db):
         return emb
 
     return await Pagination(interaction, get_page, len(servers) // per_page + 1).view()
+
+
+async def player_list(interaction, server_id, db):
+    server = get_or_default(db, server_id)
+    properties = parse_properties(os.path.join(server.path, "server.properties"))
+
+    if not properties.get("enable-query", False):
+        return await interaction.response.send_message("Query is not enable")
+
+    query = MCQuery(port=int(properties.get("query-port", properties["server-port"])))
+    try:
+        res = await query.full_stat()
+    except TimeoutError:
+        return await interaction.response.send_message("Server is offline")
+
+    players = res["players"]
+
+    per_page = 10
+    async def get_page(page):
+        emb = discord.Embed(colour=0x9e42f5)
+        emb.set_author(name=server.name, icon_url=interaction.guild.icon.url)
+        players_page = players[(page - 1) * per_page:page * per_page]
+        emb.add_field(
+            name=f"{res['numplayers']}/{res['maxplayers']} players online:",
+            value="\n" + "\n".join(p for p in players_page)
+        )
+
+        return emb
+
+    return await Pagination(interaction, get_page, len(players) // per_page + 1).view()
 

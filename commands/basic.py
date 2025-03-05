@@ -65,8 +65,9 @@ class basic(commands.Cog):
         name="list",
         description="Display all the currently online players"
     )
-    async def listCommand(self, interaction):
-        pass  # Implemented on the server
+    @app_commands.autocomplete(server=server_auto)
+    async def listCommand(self, interaction, server: int=None):
+        await serverCommand.player_list(interaction, server, self.db_engine)
 
     server = app_commands.Group(name="server", description="Manage servers")
 
